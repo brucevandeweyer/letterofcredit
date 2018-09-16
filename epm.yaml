@@ -1,0 +1,264 @@
+jobs:
+
+- name: user1
+  job:
+    account:
+      address: F64B76AAA4CBF016D8F1484D43D190807B204B60
+      
+- name: user2
+  job:
+    account:
+      address: 4057B333BFDB42EE63BD5BB8F398B4C9CC6F7217
+
+- name: bank1
+  job:
+    account:
+      address: D77E212F332CF37634E4612CF673CFEFE6CFB5C9
+      
+- name: bank2
+  job:
+    account:
+      address: 3A9F2AB4A332C6ADD7B4A2BA7C4D7A60559FD5C6
+      
+- name: admin
+  job:
+    account:
+      address: 319AEE8C5F1BBE69B1AF15DD5AAEC6103D3966EF
+      
+- name: deployDoug
+  job:
+    deploy:
+      contract: LoC.sol
+      instance: Doug
+
+- name: deployUsersDb
+  job:
+    deploy:
+      contract: LoC.sol
+      instance: UsersDb
+      
+- name: deployUsers
+  job:
+    deploy:
+      contract: LoC.sol
+      instance: Users
+      
+- name: deployLettersDb
+  job:
+    deploy:
+      contract: LoC.sol
+      instance: LettersDb
+      
+- name: deployLetters
+  job:
+    deploy:
+      contract: LoC.sol
+      instance: Letters
+      
+- name: deployPaymentsDb
+  job:
+    deploy:
+      contract: LoC.sol
+      instance: PaymentsDb
+      
+- name: deployPayments
+  job:
+    deploy:
+      contract: LoC.sol
+      instance: Payments
+      
+- name: deployLoC
+  job:
+    deploy:
+      contract: LoC.sol
+      instance: LoC
+      
+- name: regAddrUsersDb
+  job:
+    call:
+      destination: $deployDoug
+      function: addContract
+      data:
+        - usersdb
+        - $deployUsersDb
+        
+- name: regAddrUsers
+  job:
+    call:
+      destination: $deployDoug
+      function: addContract
+      data:
+        - users
+        - $deployUsers
+        
+- name: regAddrLettersDb
+  job:
+    call:
+      destination: $deployDoug
+      function: addContract
+      data:
+        - lettersdb
+        - $deployLettersDb
+
+        
+- name: regAddrLetters
+  job:
+    call:
+      destination: $deployDoug
+      function: addContract
+      data:
+        - letters
+        - $deployLetters
+        
+- name: regAddrPaymentsDb
+  job:
+    call:
+      destination: $deployDoug
+      function: addContract
+      data:
+        - paymentsdb
+        - $deployPaymentsDb
+        
+- name: regAddrPayments
+  job:
+    call:
+      destination: $deployDoug
+      function: addContract
+      data:
+        - payments
+        - $deployPayments
+        
+- name: regAddrLoC
+  job:
+    call:
+      destination: $deployDoug
+      function: addContract
+      data:
+        - loc
+        - $deployLoC
+
+- name: addUser1
+  job:
+    call:
+      destination: $deployLoC
+      function: addUser
+      data:
+        - $user1
+        - 1
+
+- name: addUser2
+  job:
+    call:
+      destination: $deployLoC
+      function: addUser
+      data:
+        - $user2
+        - 1
+        
+- name: addBank1
+  job:
+    call:
+      destination: $deployLoC
+      function: addUser
+      data:
+        - $bank1
+        - 2
+
+- name: addBank2
+  job:
+    call:
+      destination: $deployLoC
+      function: addUser
+      data:
+        - $bank2
+        - 2
+        
+- name: loginBuyer
+  job:
+    account:
+      address: $user1
+        
+- name: addLetter0
+  job:
+    call:
+      destination: $deployLoC
+      function: addLetter
+      data:
+        - $user1
+        - $bank1
+        - $user2
+        - $bank2
+        - 50000
+        - 12345
+        
+- name: loginSeller
+  job:
+    account:
+      address: $user2
+
+- name: setReference
+  job:
+    call:
+      destination: $deployLoC
+      function: setReference
+      data:
+        - 0
+        - 12345
+        
+- name: loginBuyer
+  job:
+    account:
+      address: $user1
+        
+- name: confirmDelivery
+  job:
+    call:
+      destination: $deployLoC
+      function: confirmDelivery
+      data:
+        - 0
+        - 12345
+        
+- name: loginBuyerBank
+  job:
+    account:
+      address: $bank1
+
+- name: deposit
+  job:
+    call:
+      destination: $deployPaymentsDb
+      function: deposit
+      amount: 100000
+      
+- name: payLetter
+  job:
+    call:
+      destination: $deployLoC
+      function: getPayment
+      data:
+        - 0
+
+- name: checkStatus
+  job:
+    call:
+      destination: $deployLettersDb
+      function: checkStatus
+      data:
+        - 0
+        
+- name: checkBalanceBuyerBank
+  job:
+    call:
+      destination: $deployPaymentsDb
+      function: checkBalance
+      data:
+        - $bank1
+        
+- name: checkBalanceSellerBank
+  job:
+    call:
+      destination: $deployPaymentsDb
+      function: checkBalance
+      data:
+        - $bank2
