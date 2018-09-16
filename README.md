@@ -10,5 +10,5 @@ The Letter of Credit prototype is build around the CMC ***Doug***. All contracts
 
 ## Content
 
-- loc.sol: Solidity files that contains all the contracts
+- loc.sol: Solidity file that contains all the contracts
 - epm.yaml: Happy path script
